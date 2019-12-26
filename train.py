@@ -31,7 +31,7 @@ tf.flags.DEFINE_float("l2_reg_lambda", 1.0, "L2 regularization lambda (default: 
 
 # Training parameters
 tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")
-tf.flags.DEFINE_integer("num_epochs", 100, "Number of training epochs (default: 200)")
+tf.flags.DEFINE_integer("num_epochs", 40, "Number of training epochs (default: 200)")
 tf.flags.DEFINE_integer("evaluate_every", 100, "Evaluate model on dev set after this many steps (default: 100)")
 tf.flags.DEFINE_integer("checkpoint_every", 100, "Save model after this many steps (default: 100)")
 tf.flags.DEFINE_integer("num_checkpoints", 5, "Number of checkpoints to store (default: 5)")
@@ -127,7 +127,7 @@ with tf.Graph().as_default():
 
         # Define Training procedure
         global_step = tf.Variable(0, name="global_step", trainable=False)
-        optimizer = tf.train.AdamOptimizer(cnn.learning_rate)
+        optimizer = tf.compat.v1.train.AdamOptimizer(cnn.learning_rate)
         grads_and_vars = optimizer.compute_gradients(cnn.loss)
         train_op = optimizer.apply_gradients(grads_and_vars, global_step=global_step)
 
@@ -135,11 +135,11 @@ with tf.Graph().as_default():
         grad_summaries = []
         for g, v in grads_and_vars:
             if g is not None:
-                grad_hist_summary = tf.summary.histogram("{}/grad/hist".format(v.name), g)
-                sparsity_summary = tf.summary.scalar("{}/grad/sparsity".format(v.name), tf.nn.zero_fraction(g))
+                grad_hist_summary = tf.compat.v1.summary.histogram("{}/grad/hist".format(v.name), g)
+                sparsity_summary = tf.compat.v1.summary.scalar("{}/grad/sparsity".format(v.name), tf.nn.zero_fraction(g))
                 grad_summaries.append(grad_hist_summary)
                 grad_summaries.append(sparsity_summary)
-        grad_summaries_merged = tf.summary.merge(grad_summaries)
+        grad_summaries_merged = tf.compat.v1.summary.merge(grad_summaries)
 
         # Output directory for models and summaries
         timestamp = str(int(time.time()))
@@ -173,13 +173,13 @@ with tf.Graph().as_default():
         checkpoint_prefix = os.path.join(checkpoint_dir, "model")
         if not os.path.exists(checkpoint_dir):
             os.makedirs(checkpoint_dir)
-        saver = tf.train.Saver(tf.global_variables(), max_to_keep=FLAGS.num_checkpoints)
+        saver = tf.compat.v1.train.Saver(tf.compat.v1.global_variables(), max_to_keep=FLAGS.num_checkpoints)
 
         # Write vocabulary
         vocab_processor.save(os.path.join(out_dir, "vocab"))
 
         # Initialize all variables
-        sess.run(tf.global_variables_initializer())
+        sess.run(tf.compat.v1.global_variables_initializer())
         if FLAGS.enable_word_embeddings and cfg['word_embeddings']['default'] is not None:
             vocabulary = vocab_processor.vocabulary_
             initW = None

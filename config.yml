@@ -3,9 +3,8 @@ word_embeddings:
   # Just set the default to empty string to disable the word embeddings
   default: word2vec
   word2vec:
-    #path: ../../data/input/word_embeddings/GoogleNews-vectors-negative300.bin
-    #path: /data/ourdata/yash_work/english_cleaned/eng_comments_min5_dot_consec_word2vec.bin
-    path: /data/ourdata/yash_work/hindi_word2vec/pure_hindi/pure_hindi_min5_word2vec.bin
+    #path: /data/ourdata/yash_work/hindi_word2vec/pure_hindi/pure_hindi_min5_word2vec.bin
+    path: /data1/our_data/yash_work/vk_word2vec/pure_kannada_min5_win10_word2vec.bin
     dimension: 300
     binary: True
   glove:
