@@ -248,7 +248,7 @@ with tf.Graph().as_default():
             counter += 1
             x_batch, y_batch = zip(*batch)
             train_step(x_batch, y_batch, learning_rate)
-            current_step = tf.train.global_step(sess, global_step)
+            current_step = tf.compat.v1.train.global_step(sess, global_step)
             if current_step % FLAGS.evaluate_every == 0:
                 print("\nEvaluation:")
                 dev_step(x_dev, y_dev, writer=dev_summary_writer)
@@ -258,3 +258,6 @@ with tf.Graph().as_default():
                 print("Saved model checkpoint to {}\n".format(path))
             #if current_step == 20000:
             #    break
+
+
+print('\nProcess completed')
