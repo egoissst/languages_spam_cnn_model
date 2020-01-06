@@ -69,7 +69,7 @@ def get_model_dir_from_model_num(model_num):
 
 
 #MODEL_NUM = 1577188539
-MODEL_NUM = 1577110428
+MODEL_NUM = 1577431418
 
 model_dir = get_model_dir_from_model_num(MODEL_NUM)
 print('model dir : ', model_dir)

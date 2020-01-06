@@ -22,16 +22,18 @@ def softmax(x):
 
 
 SPAM_THRESHOLD = 0.5
-clean_str_function = data_helpers.clean_str_pure_hindi
+#clean_str_function = data_helpers.clean_str_pure_hindi
+clean_str_function = data_helpers.filter_kannada
 
-csvFileName = 'NBTO_22_28_May'
-#csvSuffix = '.neg'
-csvSuffix = '.csv'
+#csvFileName = 'NBTO_22_28_May'
+csvFileName = 'vk_spam_23Dec'
+csvSuffix = '.pos'
+#csvSuffix = '.csv'
 csvFilePath = 'after_train/data_to_run/' + csvFileName + csvSuffix
 
-df = pd.read_csv(csvFilePath)
+#df = pd.read_csv(csvFilePath)
 #df = pd.read_csv(csvFilePath, names=['C_T'])
-#df = pd.read_csv(csvFilePath, names=['C_T'], header=None)
+df = pd.read_csv(csvFilePath, names=['C_T'], header=None)
 
 #df = df[:30]
 
@@ -48,7 +50,7 @@ y_test = None
 
 # Map data into vocabulary
 
-model_name = 'model_1557837780_20k'
+model_name = 'model_1577431418'
 
 base_dir = "saved_models/" + model_name+ "/"
 
@@ -60,26 +62,28 @@ def my_tokenizer_func(iterator):
 vocab_processor = learn.preprocessing.VocabularyProcessor.restore(vocab_path)
 x_test = np.array(list(vocab_processor.transform(x_raw)))
 
+print(x_test)
+
 print("\nEvaluating...\n")
 
-with tf.Session() as sess:
+with tf.compat.v1.Session() as sess:
     model_filename = base_dir + 'frozen_model.pb'
 
     with gfile.FastGFile(model_filename, 'rb') as f:
-        graph_def = tf.GraphDef()
+        graph_def = tf.compat.v1.GraphDef()
         graph_def.ParseFromString(f.read())
         g_in = tf.import_graph_def(graph_def)
-        # output_node_names =[n.name for n in tf.get_default_graph().as_graph_def().node]
+        # output_node_names =[n.name for n in tf.compat.v1.get_default_graph().as_graph_def().node]
         # Get the placeholders from the graph by name
-        input_x = tf.get_default_graph().get_operation_by_name("import/input_x").outputs[0]
+        input_x = tf.compat.v1.get_default_graph().get_operation_by_name("import/input_x").outputs[0]
         # input_y = graph.get_operation_by_name("input_y").outputs[0]
-        dropout_keep_prob = tf.get_default_graph().get_operation_by_name("import/dropout_keep_prob").outputs[0]
+        dropout_keep_prob = tf.compat.v1.get_default_graph().get_operation_by_name("import/dropout_keep_prob").outputs[0]
 
         # Tensors we want to evaluate
-        scores = tf.get_default_graph().get_operation_by_name("import/output/scores").outputs[0]
+        scores = tf.compat.v1.get_default_graph().get_operation_by_name("import/output/scores").outputs[0]
 
         # Tensors we want to evaluate
-        predictions = tf.get_default_graph().get_operation_by_name("import/output/predictions").outputs[0]
+        predictions = tf.compat.v1.get_default_graph().get_operation_by_name("import/output/predictions").outputs[0]
 
         # Generate batches for one epoch
         batches = data_helpers.batch_iter(list(x_test), 1, 1, shuffle=False)
@@ -116,7 +120,7 @@ df[model_name] = prob_arr
 SPAM_THRESHOLD = 0.5
 df['isSpam_' + model_name] = df[model_name]>=SPAM_THRESHOLD
 
-out_file_name = csvFileName + '_prediction.csv'
+out_file_name = csvFileName + '_pos_prediction.csv'
 out_path = base_dir + out_file_name
 
 print("Saving evaluation to {0}".format(out_path))

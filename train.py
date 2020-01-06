@@ -90,6 +90,8 @@ max_document_length = max([len(x.split(" ")) for x in x_text])
 vocab_processor = learn.preprocessing.VocabularyProcessor(max_document_length, tokenizer_fn = my_tokenizer_func)
 x = np.array(list(vocab_processor.fit_transform(x_text)))
 
+# print(x[:20])
+
 # Randomly shuffle data
 np.random.seed(10)
 shuffle_indices = np.random.permutation(np.arange(len(y)))
