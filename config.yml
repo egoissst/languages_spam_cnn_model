@@ -4,7 +4,9 @@ word_embeddings:
   default: word2vec
   word2vec:
     #path: /data/ourdata/yash_work/hindi_word2vec/pure_hindi/pure_hindi_min5_word2vec.bin
-    path: /data1/our_data/yash_work/vk_word2vec/pure_kannada_min5_win10_word2vec.bin
+    #path: /data1/our_data/yash_work/vk_word2vec/pure_kannada_min5_win10_word2vec.bin
+    #path: /data1/our_data/yash_work/malay_word2vec/pure_malay_min5_win10_word2vec.bin
+    path: /data1/yash_work/word2vecs/malay_word2vec/pure_malay_min5_win10_word2vec.bin
     dimension: 300
     binary: True
   glove:
@@ -18,13 +20,17 @@ datasets:
   mrpolarity:
     positive_data_file: 
       #path: "data/rt-polaritydata/rt-polarity.pos"
-      #path: "data/rt-polaritydata/rt-polarity-hindi_uniq_trim_doubt_not_kept_remApproxDup_oriTrimKept_shuf.pos"      
-      path: "data/rt-polaritydata/vk_spam_23Dec.pos"
+      #path: "data/rt-polaritydata/vk_spam_23Dec.pos"
+      #path: "data/rt-polaritydata/vk_spam_23Dec_shuf.pos"
+      #path: "data/rt-polaritydata/vk_spam_10Jan_shuf.pos"
+      path: "data/rt-polaritydata/malay_spam_16Jan.pos"
       info: "Data source for the positive data"
     negative_data_file:
       #path: "data/rt-polaritydata/rt-polarity.neg"
-      #path: "data/rt-polaritydata/rt-polarity-hindi_uniq_off_words_new_added_shuf.neg"
-      path: "data/rt-polaritydata/vk_spam_23Dec.neg"
+      #path: "data/rt-polaritydata/vk_spam_23Dec.neg"
+      #path: "data/rt-polaritydata/vk_spam_23Dec_shuf.neg"
+      #path: "data/rt-polaritydata/vk_spam_10Jan_shuf.neg"
+      path: "data/rt-polaritydata/malay_ham_16Jan.neg"
       info: "Data source for the negative data"
   20newsgroup:
     # The dataset includes following 20 newsgroups:

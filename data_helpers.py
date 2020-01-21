@@ -47,6 +47,16 @@ def filter_kannada(text):
     return mod_text.strip()
 
 
+def filter_malayalam(text):
+    """
+    filters for only kannada language
+    """
+    #re.search returns None if not found
+    mod_text = re.sub(r"[^\u0D00-\u0D7F]", " ", text)
+    mod_text = re.sub(r"\s{2,}", " ", mod_text)
+    return mod_text.strip()
+
+
 def batch_iter(data, batch_size, num_epochs, shuffle=True):
     """
     Generates a batch iterator for a dataset.
@@ -86,9 +96,9 @@ def get_datasets_mrpolarity(positive_data_file, negative_data_file):
     Returns split sentences and labels.
     """
     # Load data from files
-    positive_examples = list(open(positive_data_file, "r").readlines())
+    positive_examples = list(open(positive_data_file, "r", encoding='utf-8').readlines())
     positive_examples = [s.strip() for s in positive_examples]
-    negative_examples = list(open(negative_data_file, "r").readlines())
+    negative_examples = list(open(negative_data_file, "r",  encoding='utf-8').readlines())
     negative_examples = [s.strip() for s in negative_examples]
 
     datasets = dict()
@@ -127,7 +137,8 @@ def load_data_labels(datasets):
     
     #x_text = [clean_str(sent) for sent in x_text]
     #x_text = [clean_str_pure_hindi(sent) for sent in x_text]
-    x_text = [filter_kannada(sent) for sent in x_text]
+    #x_text = [filter_kannada(sent) for sent in x_text]
+    x_text = [filter_malayalam(sent) for sent in x_text]
 
     # Generate labels
     labels = []

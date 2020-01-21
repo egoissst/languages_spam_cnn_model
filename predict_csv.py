@@ -23,21 +23,25 @@ def softmax(x):
 
 SPAM_THRESHOLD = 0.5
 #clean_str_function = data_helpers.clean_str_pure_hindi
-clean_str_function = data_helpers.filter_kannada
+#clean_str_function = data_helpers.filter_kannada
+clean_str_function = data_helpers.filter_malayalam
 
 #csvFileName = 'NBTO_22_28_May'
-csvFileName = 'vk_spam_23Dec'
-csvSuffix = '.pos'
-#csvSuffix = '.csv'
+#csvFileName = 'vk_spam_new'
+#csvFileName = 'vk_spam_10Jan_shuf'
+csvFileName = 'malay_eval'
+#csvSuffix = '.neg'
+csvSuffix = '.csv'
 csvFilePath = 'after_train/data_to_run/' + csvFileName + csvSuffix
 
-#df = pd.read_csv(csvFilePath)
+df = pd.read_csv(csvFilePath)
 #df = pd.read_csv(csvFilePath, names=['C_T'])
-df = pd.read_csv(csvFilePath, names=['C_T'], header=None)
+#df = pd.read_csv(csvFilePath, names=['C_T'], header=None)
 
 #df = df[:30]
 
-x_raw1 = df['C_T'].tolist()
+#x_raw1 = df['C_T'].tolist()
+x_raw1 = df['Comment Text'].tolist()
 x_raw = [clean_str_function(sent) for sent in x_raw1]
 
 print('shape of dataframe : ' + str(df.shape))
@@ -50,7 +54,8 @@ y_test = None
 
 # Map data into vocabulary
 
-model_name = 'model_1577431418'
+#model_name = 'model_1578653672'
+model_name = 'model_1579177474_MALAY'
 
 base_dir = "saved_models/" + model_name+ "/"
 
@@ -120,7 +125,7 @@ df[model_name] = prob_arr
 SPAM_THRESHOLD = 0.5
 df['isSpam_' + model_name] = df[model_name]>=SPAM_THRESHOLD
 
-out_file_name = csvFileName + '_pos_prediction.csv'
+out_file_name = csvFileName + '_prediction_2.csv'
 out_path = base_dir + out_file_name
 
 print("Saving evaluation to {0}".format(out_path))
