@@ -14,12 +14,17 @@ import math
 from data_helpers import my_tokenizer_func
 
 from helper_funcs import get_file_string_from_config_props
+from gensim.models import KeyedVectors
+import  GenericMailerService
 
 # Parameters
 # ==================================================
 
+to_send_mail_alert = True
+
 # Data loading params
-tf.flags.DEFINE_float("dev_sample_percentage", .2, "Percentage of the training data to use for validation")
+#tf.flags.DEFINE_float("dev_sample_percentage", .2, "Percentage of the training data to use for validation")
+tf.flags.DEFINE_float("dev_sample_percentage", .05, "Percentage of the training data to use for validation")
 
 # Model Hyperparameters
 tf.flags.DEFINE_boolean("enable_word_embeddings", True, "Enable/disable the word embedding (default: True)")
@@ -31,7 +36,7 @@ tf.flags.DEFINE_float("l2_reg_lambda", 1.0, "L2 regularization lambda (default: 
 
 # Training parameters
 tf.flags.DEFINE_integer("batch_size", 64, "Batch Size (default: 64)")
-tf.flags.DEFINE_integer("num_epochs", 40, "Number of training epochs (default: 200)")
+tf.flags.DEFINE_integer("num_epochs", 25, "Number of training epochs (default: 200)")
 tf.flags.DEFINE_integer("evaluate_every", 100, "Evaluate model on dev set after this many steps (default: 100)")
 tf.flags.DEFINE_integer("checkpoint_every", 100, "Save model after this many steps (default: 100)")
 tf.flags.DEFINE_integer("num_checkpoints", 5, "Number of checkpoints to store (default: 5)")
@@ -39,6 +44,8 @@ tf.flags.DEFINE_integer("num_checkpoints", 5, "Number of checkpoints to store (d
 tf.flags.DEFINE_boolean("allow_soft_placement", True, "Allow device soft device placement")
 tf.flags.DEFINE_boolean("log_device_placement", False, "Log placement of ops on devices")
 tf.flags.DEFINE_float("decay_coefficient", 2.5, "Decay coefficient (default: 2.5)")
+
+tf.flags.DEFINE_boolean("to_take_full_w2v_vocab", True, "To take full word2vec vocab for embedding layer")
 
 FLAGS = tf.flags.FLAGS
 #FLAGS._parse_flags()
@@ -85,10 +92,32 @@ elif dataset_name == "localdata":
                                                      random_state=cfg["datasets"][dataset_name]["random_state"])
 x_text, y = data_helpers.load_data_labels(datasets)
 
+
+print('x_text len: ', len(x_text))
+
 # Build vocabulary
 max_document_length = max([len(x.split(" ")) for x in x_text])
-vocab_processor = learn.preprocessing.VocabularyProcessor(max_document_length, tokenizer_fn = my_tokenizer_func)
-x = np.array(list(vocab_processor.fit_transform(x_text)))
+vocab_processor = learn.preprocessing.VocabularyProcessor(max_document_length = max_document_length, tokenizer_fn = my_tokenizer_func)
+
+if FLAGS.to_take_full_w2v_vocab:
+    print('considering full vocab of word2vec for Vocabularty processor')
+    word2vec_wv = KeyedVectors.load_word2vec_format(cfg['word_embeddings']['word2vec']['path'], binary=True)
+    word2vec_vocab = list(word2vec_wv.vocab.keys())
+    print('word2vec_vocab len: ', len(word2vec_vocab))
+
+    #Only keeping the word2vec vocab for now. Can later be extended to include the training set vocab but those should be set as trainable and the rest as frozen
+    word2vec_vocab.extend(x_text)
+
+    print('word2vec_vocab len: ', len(word2vec_vocab))
+
+    vocab_processor.fit_transform(word2vec_vocab)
+    x = np.array(list(vocab_processor.transform(x_text)))
+else:
+    print('considering only the training set vocab for vocabularyProcessor')
+    x = np.array(list(vocab_processor.fit_transform(x_text)))
+
+print('len vocab processor : ', len(vocab_processor.vocabulary_._mapping))
+
 
 # print(x[:20])
 
@@ -263,3 +292,8 @@ with tf.Graph().as_default():
 
 
 print('\nProcess completed')
+
+if to_send_mail_alert:
+    mail_obj = GenericMailerService.get_mailer_object_for_ml_process_alert('MTO comments Training process is complete. Check please.')
+    print('sending alert mail')
+    GenericMailerService.send_mailer(mail_obj)
