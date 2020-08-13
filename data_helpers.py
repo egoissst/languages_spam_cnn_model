@@ -36,6 +36,27 @@ from sklearn.datasets import load_files
 #    return string.strip()
 
 
+def clean_str_pure_hindi(string):
+    """ 
+    Tokenization/string cleaning for all datasets except for SST.
+    Original taken from https://github.com/yoonkim/CNN_sentence/blob/master/process_data.py
+    """
+    string = re.sub(r"[^\u0900\u0901\u0902\u0903\u0904\u0905\u0906\u0907\u0908\u0909\u090a\u090b\u090c\u090d\u090e\u090f\u0910\u0911\u0912\u0913\u0914\u0915\u0916\u0917\u0918\u0919\u091a\u091b\u091c\u091d\u091e\u091f\u0920\u0921\u0922\u0923\u0924\u0925\u0926\u0927\u0928\u0929\u092a\u092b\u092c\u092d\u092e\u092f\u0930\u0931\u0932\u0933\u0934\u0935\u0936\u0937\u0938\u0939\u093a\u093b\u093c\u093d\u093e\u093f\u0940\u0941\u0942\u0943\u0944\u0945\u0946\u0947\u0948\u0949\u094a\u094b\u094c\u094d\u094e\u094f\u0950\u0951\u0952\u0953\u0954\u0955\u0956\u0957\u0958\u0959\u095a\u095b\u095c\u095d\u095e\u095f\u0960\u0961\u0962\u0963\u0964\u0965\u0966\u0967\u0968\u0969\u096a\u096b\u096c\u096d\u096e\u096f\u0970\u0971\u0972\u0973\u0974\u0975\u0976\u0977\u0978\u0979\u097a\u097b\u097c\u097d\u097e\u097f]", " ", string)
+
+    string = re.sub(r"\s{2,}", " ", string)
+    return string.strip()
+
+
+def filter_devanagiri(text):
+    """
+    filters for only devanagiri scripting language
+    """
+    #re.search returns None if not found
+    mod_text = re.sub(r"[^\u0900-\u097F]", " ", text)
+    mod_text = re.sub(r"\s{2,}", " ", mod_text)
+    return mod_text.strip()
+
+
 def filter_kannada(text):
     """
     filters for only kannada language
@@ -43,6 +64,16 @@ def filter_kannada(text):
     """
     #re.search returns None if not found
     mod_text = re.sub(r"[^\u0C80-\u0CFF]", " ", text)
+    mod_text = re.sub(r"\s{2,}", " ", mod_text)
+    return mod_text.strip()
+
+
+def filter_malayalam(text):
+    """
+    filters for only kannada language
+    """
+    #re.search returns None if not found
+    mod_text = re.sub(r"[^\u0D00-\u0D7F]", " ", text)
     mod_text = re.sub(r"\s{2,}", " ", mod_text)
     return mod_text.strip()
 
@@ -86,9 +117,9 @@ def get_datasets_mrpolarity(positive_data_file, negative_data_file):
     Returns split sentences and labels.
     """
     # Load data from files
-    positive_examples = list(open(positive_data_file, "r").readlines())
+    positive_examples = list(open(positive_data_file, "r", encoding='utf-8').readlines())
     positive_examples = [s.strip() for s in positive_examples]
-    negative_examples = list(open(negative_data_file, "r").readlines())
+    negative_examples = list(open(negative_data_file, "r", encoding='utf-8').readlines())
     negative_examples = [s.strip() for s in negative_examples]
 
     datasets = dict()
@@ -127,7 +158,8 @@ def load_data_labels(datasets):
     
     #x_text = [clean_str(sent) for sent in x_text]
     #x_text = [clean_str_pure_hindi(sent) for sent in x_text]
-    x_text = [filter_kannada(sent) for sent in x_text]
+    #x_text = [filter_kannada(sent) for sent in x_text]
+    x_text = [filter_devanagiri(sent) for sent in x_text]
 
     # Generate labels
     labels = []

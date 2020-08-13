@@ -1,7 +1,12 @@
-import os, argparse
+import os
+#import argparse
+import sys
 
 import tensorflow as tf
 #PLEASE INPUT THE MODEL DIRECTORY
+
+# to run - .env/bin/python createPB.py 1586784206
+
 def freeze_graph(model_dir, output_node_names):    
     """Extract the sub graph defined by the output nodes and convert 
     all its variables into constant 
@@ -27,7 +32,6 @@ def freeze_graph(model_dir, output_node_names):
     absolute_model_dir = "/".join(input_checkpoint.split('/')[:-1])
     output_graph = absolute_model_dir + "/frozen_model.pb"
 
-    #output_graph = '/data1/vanilla_cnn_dennybritz/cnn-text-classification-tf_cahya/runs/1558012024/frozen_model.pb'
     #output_graph = '/data1/vanilla_cnn_dennybritz/cnn-text-classification-tf_cahya/saved_models/saved_chkp/model_1550222502_21k_iters/frozen_model.pb'
 
     # We clear devices to allow TensorFlow to control on which device it will load operations
@@ -68,12 +72,16 @@ def get_model_dir_from_model_num(model_num):
     return model_dir
 
 
-#MODEL_NUM = 1577188539
-MODEL_NUM = 1577431418
+#MODEL_NUM = 1586358717
+try:
+    MODEL_NUM = int(sys.argv[1])
+except Exception as ex:
+    print('exception : {}'.format(ex))
+    print('aborting')
+    sys.exit(0)
 
 model_dir = get_model_dir_from_model_num(MODEL_NUM)
 print('model dir : ', model_dir)
-#model_dir = "/data1/vanilla_cnn_dennybritz/cnn-text-classification-tf_cahya/runs/1558012024/checkpoints/"
 #model_dir = "/data1/vanilla_cnn_dennybritz/cnn-text-classification-tf_cahya/saved_models/saved_chkp/model_1550222502_21k_iters/checkpoints/"
 
 #output_node_names = ""
